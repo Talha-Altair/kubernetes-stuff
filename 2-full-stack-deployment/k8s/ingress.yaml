@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: altair
+  labels:
+    name: altair
+spec:
+  rules:
+  - host: db-ui.balaji.ml
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: mongo-express
+            port: 
+              number: 80
+  - host: frontend.balaji.ml
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: backend
+            port:
+              number: 80
