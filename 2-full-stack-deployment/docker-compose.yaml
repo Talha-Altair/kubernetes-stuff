@@ -1,0 +1,52 @@
+version: "3.1"
+
+services:
+  
+  backend:
+
+    build: backend/
+    hostname: backend_host
+    ports:
+      - "9000:9000"
+    depends_on:
+    - mongo
+    environment:
+      MONGO_HOST: "mongo_host"
+      MONGO_PORT: "27017"
+      MONGO_USER: "root"
+      MONGO_PASS: "example"
+      MONGO_DB  : "k8s-data"
+    volumes:
+      - ./backend:/app
+
+  frontend:
+
+    build: frontend/
+    depends_on:
+    - backend
+    ports:
+    - "3000:3000"
+    environment:
+      BACKEND_URL: "http://backend_host:9000"
+    volumes:
+      - ./frontend:/app
+
+  mongo:
+    image: mongo
+    hostname: mongo_host
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - 8081:8081
+    depends_on:
+    - mongo
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/

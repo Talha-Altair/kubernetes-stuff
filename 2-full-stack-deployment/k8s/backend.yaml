@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: backend
+spec:
+  selector:
+    matchLabels:
+      app: backend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: asia-south1-docker.pkg.dev/reflecting-card-394310/k8s/backend:latest
+        envFrom:
+        - configMapRef:
+            name: backend-config
+        env:
+        - name: MONGO_USER
+          value: "root"
+        - name: MONGO_PASS
+          value: "example"
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: "100m"
+        ports:
+        - containerPort: 9000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector:
+    app: backend
+  ports:
+  - port: 80
+    targetPort: 9000
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+data:
+  MONGO_HOST: "mongo-service"
+  MONGO_PORT: "27017"
+  MONGO_DB: "k8s-data"
